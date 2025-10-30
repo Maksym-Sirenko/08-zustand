@@ -64,5 +64,3 @@ export const deleteNote = async (noteId: string) => {
   const { data } = await NoteService.delete<Note>(`/${noteId}`);
   return data as Note;
 };
-
-// export const getSingleNote;
