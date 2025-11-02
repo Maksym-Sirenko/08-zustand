@@ -8,11 +8,13 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useId } from 'react';
 import { createNote } from '@/lib/api';
 import css from './NoteForm.module.css';
+import { useNoteDraftStore } from '@/lib/store/noteStore';
+// import { title } from 'process';
 
 const TAGS = ['Todo', 'Work', 'Personal', 'Meeting', 'Shopping'] as const;
 
 interface NoteFormProps {
-  onClose: () => void;
+  onClose?: () => void;
   onSuccess?: () => void;
 }
 
@@ -22,11 +24,11 @@ interface NoteFormValues {
   tag: NoteTag;
 }
 
-const initialValues: NoteFormValues = {
-  title: '',
-  content: '',
-  tag: 'Todo',
-};
+// const initialValues: NoteFormValues = {
+//   title: '',
+//   content: '',
+//   tag: 'Todo',
+// };
 
 const validationSchema = Yup.object({
   title: Yup.string()
@@ -43,12 +45,15 @@ const NoteForm = ({ onClose, onSuccess }: NoteFormProps) => {
   const queryClient = useQueryClient();
   const fieldId = useId();
 
+  const { draft, setDraft, clearDraft } = useNoteDraftStore();
+
   const { mutateAsync, isPending } = useMutation({
     mutationFn: createNote,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notes'] });
+      clearDraft();
       onSuccess?.();
-      onClose();
+      onClose?.();
     },
   });
 
@@ -60,9 +65,16 @@ const NoteForm = ({ onClose, onSuccess }: NoteFormProps) => {
     actions.resetForm();
   };
 
+  const initialDraftValues: NoteFormValues = {
+    title: draft.title ?? '',
+    content: draft.content ?? '',
+    tag: (draft.tag as NoteTag) ?? 'Todo',
+  };
+
   return (
     <Formik
-      initialValues={initialValues}
+      initialValues={initialDraftValues}
+      enableReinitialize={true}
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
       validateOnMount
@@ -71,12 +83,21 @@ const NoteForm = ({ onClose, onSuccess }: NoteFormProps) => {
         <Form className={css.form}>
           <div className={css.formGroup}>
             <label htmlFor={`${fieldId}-title`}>Title</label>
-            <Field
-              id={`${fieldId}-title`}
-              name="title"
-              type="text"
-              className={css.input}
-            />
+            <Field name="title">
+              {({ field }: any) => (
+                <input
+                  {...field}
+                  id={`${fieldId}-title`}
+                  className={css.input}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    const v = e.target.value;
+                    setDraft({ title: v });
+                    setFieldValue('title', v, false);
+                  }}
+                />
+              )}
+            </Field>
             <ErrorMessage name="title" component="span" className={css.error} />
           </div>
 

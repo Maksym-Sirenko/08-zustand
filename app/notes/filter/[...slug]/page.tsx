@@ -6,6 +6,33 @@ import {
 import { fetchNotes, PER_PAGE } from '@/lib/api';
 import NotesClient from './Notes.client';
 import { ALL_NOTES } from '@/lib/constants';
+import type { Metadata } from 'next';
+import { IMAGE_URL, VERSEL_URL } from '@/lib/constants';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string[] };
+}): Promise<Metadata> {
+  const slug = params.slug?.[0] ?? 'all';
+  return {
+    title: `Notes - ${slug}`,
+    description: `Notes filtered by ${slug}`,
+    openGraph: {
+      title: `Notes - ${slug}`,
+      description: `Notes filtered by ${slug}`,
+      url: `${VERSEL_URL}/notes/filter/${slug}`,
+      images: [
+        {
+          url: IMAGE_URL,
+          width: 1200,
+          height: 630,
+          alt: 'Notes',
+        },
+      ],
+    },
+  };
+}
 
 interface Props {
   params: Promise<{ slug: string[] }>;
