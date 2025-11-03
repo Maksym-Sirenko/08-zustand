@@ -1,14 +1,12 @@
 export const ALL_NOTES = 'all';
 
 export const TAGS = [
+  'Todo',
   'Work',
   'Personal',
-  'Ideas',
-  'Important',
-  'Tasks',
+  'Meeting',
+  'Shopping',
 ] as const;
-
-export type Tag = (typeof TAGS)[number];
 
 export const VERSEL_URL = 'https://08-zustand-livid-one.vercel.app/';
 export const IMAGE_URL =

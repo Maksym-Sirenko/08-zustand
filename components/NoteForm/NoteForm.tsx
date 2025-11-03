@@ -1,7 +1,13 @@
 'use client';
 
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import type { FormikHelpers } from 'formik';
+import {
+  Formik,
+  Form,
+  Field,
+  ErrorMessage,
+  FieldProps,
+  FormikHelpers,
+} from 'formik';
 import type { NoteTag } from '@/types/note';
 import * as Yup from 'yup';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -9,7 +15,7 @@ import { useId } from 'react';
 import { createNote } from '@/lib/api';
 import css from './NoteForm.module.css';
 import { useNoteDraftStore } from '@/lib/store/noteStore';
-// import { title } from 'process';
+import { useRouter } from 'next/navigation';
 
 const TAGS = ['Todo', 'Work', 'Personal', 'Meeting', 'Shopping'] as const;
 
@@ -21,14 +27,8 @@ interface NoteFormProps {
 interface NoteFormValues {
   title: string;
   content: string;
-  tag: NoteTag;
+  tag: NoteTag | string;
 }
-
-// const initialValues: NoteFormValues = {
-//   title: '',
-//   content: '',
-//   tag: 'Todo',
-// };
 
 const validationSchema = Yup.object({
   title: Yup.string()
@@ -42,6 +42,7 @@ const validationSchema = Yup.object({
 });
 
 const NoteForm = ({ onClose, onSuccess }: NoteFormProps) => {
+  const router = useRouter();
   const queryClient = useQueryClient();
   const fieldId = useId();
 
@@ -53,7 +54,8 @@ const NoteForm = ({ onClose, onSuccess }: NoteFormProps) => {
       queryClient.invalidateQueries({ queryKey: ['notes'] });
       clearDraft();
       onSuccess?.();
-      onClose?.();
+      if (onClose) onClose();
+      else router.push('/notes/filter/all');
     },
   });
 
@@ -66,70 +68,80 @@ const NoteForm = ({ onClose, onSuccess }: NoteFormProps) => {
   };
 
   const initialDraftValues: NoteFormValues = {
-    title: draft.title ?? '',
-    content: draft.content ?? '',
-    tag: (draft.tag as NoteTag) ?? 'Todo',
+    title: draft?.title ?? '',
+    content: draft?.content ?? '',
+    tag: (draft?.tag as NoteTag) ?? 'Todo',
   };
 
   return (
     <Formik
       initialValues={initialDraftValues}
-      enableReinitialize={true}
+      enableReinitialize
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
       validateOnMount
     >
       {({ isValid, dirty }) => (
-        <Form className={css.form}>
+        <Form className={css.form} noValidate>
           <div className={css.formGroup}>
             <label htmlFor={`${fieldId}-title`}>Title</label>
             <Field name="title">
-              {({ field }: any) => (
+              {({ field }: FieldProps) => (
                 <input
                   {...field}
                   id={`${fieldId}-title`}
                   className={css.input}
                   onChange={(e) => {
                     field.onChange(e);
-                    const v = e.target.value;
-                    setDraft({ title: v });
-                    setFieldValue('title', v, false);
+                    setDraft({ title: e.target.value });
                   }}
                 />
               )}
             </Field>
             <ErrorMessage name="title" component="span" className={css.error} />
           </div>
-
           <div className={css.formGroup}>
             <label htmlFor={`${fieldId}-content`}>Content</label>
-            <Field
-              as="textarea"
-              id={`${fieldId}-content`}
-              name="content"
-              rows={8}
-              className={css.textarea}
-            />
+            <Field name="content">
+              {({ field }: FieldProps) => (
+                <textarea
+                  {...field}
+                  id={`${fieldId}-content`}
+                  className={css.textarea}
+                  rows={8}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    setDraft({ content: e.target.value });
+                  }}
+                />
+              )}
+            </Field>
             <ErrorMessage
               name="content"
               component="span"
               className={css.error}
             />
           </div>
-
           <div className={css.formGroup}>
             <label htmlFor={`${fieldId}-tag`}>Tag</label>
-            <Field
-              as="select"
-              id={`${fieldId}-tag`}
-              name="tag"
-              className={css.select}
-            >
-              {TAGS.map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
+            <Field name="tag">
+              {({ field }: FieldProps) => (
+                <select
+                  {...field}
+                  id={`${fieldId}-tag`}
+                  className={css.select}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    setDraft({ tag: e.target.value as NoteTag });
+                  }}
+                >
+                  {TAGS.map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
+                </select>
+              )}
             </Field>
             <ErrorMessage name="tag" component="span" className={css.error} />
           </div>
@@ -138,14 +150,17 @@ const NoteForm = ({ onClose, onSuccess }: NoteFormProps) => {
             <button
               type="button"
               className={css.cancelButton}
-              onClick={onClose}
+              onClick={() => {
+                if (onClose) onClose();
+                else router.push('/notes/filter/all');
+              }}
             >
               Cancel
             </button>
             <button
               type="submit"
               className={css.submitButton}
-              disabled={isPending || !isValid || !dirty}
+              disabled={isPending || !isValid}
             >
               {isPending ? 'Creating...' : 'Create note'}
             </button>

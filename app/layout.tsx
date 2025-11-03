@@ -32,13 +32,13 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
   },
-  // twitter: {
-  //   card: 'summary_large_image',
-  //   title: 'NoteHub - Your Personal Notes Manager',
-  //   description:
-  //     'Create, organize and manage your notes efficiently with NoteHub.',
-  //   images: [IMAGE_URL],
-  // },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'NoteHub - Your Personal Notes Manager',
+    description:
+      'Create, organize and manage your notes efficiently with NoteHub.',
+    images: [IMAGE_URL],
+  },
 };
 
 export default function RootLayout({
