@@ -1,7 +1,5 @@
-'use client';
-
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+// import { useRouter } from 'next/navigation';
+// import { useEffect } from 'react';
 import css from './not-found.module.css';
 // import type { Metadata } from 'next';
 import { VERSEL_URL, IMAGE_URL } from '@/lib/constants';
@@ -25,12 +23,12 @@ export const metadata = {
 };
 
 const NotFound = () => {
-  const router = useRouter();
+  // const router = useRouter();
 
-  useEffect(() => {
-    const timer = setTimeout(() => router.push('/'), 3000);
-    return () => clearTimeout(timer);
-  }, [router]);
+  // useEffect(() => {
+  //   const timer = setTimeout(() => router.push('/'), 3000);
+  //   return () => clearTimeout(timer);
+  // }, [router]);
 
   return (
     <div className={css.container}>
@@ -38,7 +36,7 @@ const NotFound = () => {
       <p className={css.description}>
         Sorry, the page you are looking for does not exist.
       </p>
-      <p className={css.redirect}>Redirecting to homepage in 3 seconds...</p>
+      {/* <p className={css.redirect}>Redirecting to homepage in 3 seconds...</p> */}
     </div>
   );
 };
