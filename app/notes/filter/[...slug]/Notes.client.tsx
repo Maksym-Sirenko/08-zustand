@@ -1,7 +1,10 @@
 'use client';
 
 import { useState, ChangeEvent, useEffect } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  useQuery,
+  // useQueryClient
+} from '@tanstack/react-query';
 import { useDebouncedCallback } from 'use-debounce';
 import SearchBox from '@/components/SearchBox/SearchBox';
 import NoteList from '@/components/NoteList/NoteList';
@@ -27,9 +30,9 @@ const NotesClient = ({
   const [search, setSearch] = useState(initialSearch);
   const [debouncedSearch, setDebouncedSearch] = useState(initialSearch);
   const [page, setPage] = useState(initialPage);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentCategory, setCurrentCategory] = useState(category);
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
 
   useEffect(() => {
     setCurrentCategory(category);
@@ -58,10 +61,10 @@ const NotesClient = ({
     placeholderData: (previousData) => previousData,
   });
 
-  const handleCreateSuccess = () => {
-    setIsModalOpen(false);
-    queryClient.invalidateQueries({ queryKey: ['notes'] });
-  };
+  // const handleCreateSuccess = () => {
+  //   setIsModalOpen(false);
+  //   queryClient.invalidateQueries({ queryKey: ['notes'] });
+  // };
 
   if (isLoading) return <p>Loading notes...</p>;
   if (isError || !data) return <p>Could not fetch the list of notes.</p>;
@@ -70,12 +73,12 @@ const NotesClient = ({
     <section className={css.section}>
       <div className={css.header}>
         <SearchBox value={search} onChange={handleSearchChange} />
-        <div className={css.header}>
-          <SearchBox value={search} onChange={handleSearchChange} />
-          <Link href="/notes/action/create" className={css.createButton}>
-            Create Note
-          </Link>
-        </div>
+        {/* <div className={css.header}> */}
+        {/* <SearchBox value={search} onChange={handleSearchChange} /> */}
+        <Link href="/notes/action/create" className={css.createButton}>
+          Create Note
+        </Link>
+        {/* </div> */}
         {/* <button
           className={css.createButton}
           onClick={() => {
