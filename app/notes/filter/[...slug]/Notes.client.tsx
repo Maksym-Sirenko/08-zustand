@@ -17,27 +17,21 @@ import css from './Notes.client.module.css';
 import Link from 'next/link';
 
 interface Props {
-  initialSearch?: string;
-  initialPage?: number;
-  category?: string;
+  tag?: string;
 }
 
-const NotesClient = ({
-  initialSearch = '',
-  initialPage = 1,
-  category = '',
-}: Props) => {
-  const [search, setSearch] = useState(initialSearch);
-  const [debouncedSearch, setDebouncedSearch] = useState(initialSearch);
-  const [page, setPage] = useState(initialPage);
+const NotesClient = ({ tag = '' }: Props) => {
+  const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [page, setPage] = useState(1);
   // const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentCategory, setCurrentCategory] = useState(category);
+  const [currentTag, setCurrentTag] = useState(tag);
   // const queryClient = useQueryClient();
 
   useEffect(() => {
-    setCurrentCategory(category);
+    setCurrentTag(tag);
     setPage(1);
-  }, [category]);
+  }, [tag]);
 
   const debounced = useDebouncedCallback((value: string) => {
     setDebouncedSearch(value);
@@ -51,12 +45,12 @@ const NotesClient = ({
   };
 
   const { data, isLoading, isError } = useQuery<FetchNotesResponse, Error>({
-    queryKey: ['notes', debouncedSearch, page, currentCategory],
+    queryKey: ['notes', debouncedSearch, page, currentTag],
     queryFn: () =>
       fetchNotes({
         search: debouncedSearch,
         page,
-        tag: currentCategory,
+        tag: currentTag,
       }),
     placeholderData: (previousData) => previousData,
   });
@@ -73,20 +67,9 @@ const NotesClient = ({
     <section className={css.section}>
       <div className={css.header}>
         <SearchBox value={search} onChange={handleSearchChange} />
-        {/* <div className={css.header}> */}
-        {/* <SearchBox value={search} onChange={handleSearchChange} /> */}
         <Link href="/notes/action/create" className={css.createButton}>
           Create Note
         </Link>
-        {/* </div> */}
-        {/* <button
-          className={css.createButton}
-          onClick={() => {
-            setIsModalOpen(true);
-          }}
-        >
-          Create Note
-        </button> */}
       </div>
 
       {data.totalPages > 1 && (
@@ -102,15 +85,6 @@ const NotesClient = ({
       ) : (
         <p>No notes found</p>
       )}
-
-      {/* {isModalOpen && (
-        <Modal onClose={() => setIsModalOpen(false)}>
-          <NoteForm
-            onClose={() => setIsModalOpen(false)}
-            onSuccess={handleCreateSuccess}
-          />
-        </Modal>
-      )} */}
     </section>
   );
 };

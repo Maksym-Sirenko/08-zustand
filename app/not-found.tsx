@@ -1,10 +1,10 @@
 // import { useRouter } from 'next/navigation';
 // import { useEffect } from 'react';
 import css from './not-found.module.css';
-// import type { Metadata } from 'next';
+import type { Metadata } from 'next';
 import { VERSEL_URL, IMAGE_URL } from '@/lib/constants';
 
-export const metadata = {
+export const metadata: Metadata = {
   title: '404 - Not found - NoteHub',
   description: 'The requested page does not exist on NoteHub',
   openGraph: {
